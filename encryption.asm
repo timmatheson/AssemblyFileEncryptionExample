@@ -14,6 +14,11 @@ _start:
     ; Read the filename from command line arguments
     ; Arguments are passed on the stack.
     mov eax, [esp + 4] ; First argument (filename)
+
+    ; Check the number of bytes read
+    cmp eax, 256         ; compare with buffer size
+    jge buffer_overflow   ; If bytes read >= 256, jump to overflow handler
+
     mov [filename], eax ; Store filename in buffer
 
     ; Open the input file
@@ -68,6 +73,13 @@ _start:
     add esp, 4
 
     ; Exit program
-    mov eax, 1 ; sys_exit
+    mov eax, 1      ; sys_exit
     xor ebx, ebx
-    int 0x80
+    int 0x80        ; Call kernel
+
+buffer_overflow:
+    ; Handle buffer overflow case
+    ; For demonstration, just exit with an error code
+    mov eax, 1           ; sys_exit
+    mov ebx, 1           ; return code 1 (indicating error)
+    int 0x80             ; Call kernel
